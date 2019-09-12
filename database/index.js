@@ -5,7 +5,8 @@ const mysqldb_conn = mysql.createConnection({
     user: 'reza_admin',
     password: 'reza_admin10071997',
     database: 'macommerce_db',
-    port: 3306
+    port: 3306,
+    multipleStatements: true
 }) 
 
 module.exports = mysqldb_conn;

@@ -21,5 +21,8 @@ router.delete('/deleteCategory/:categoryName', auth, adminController.deleteCateg
 router.delete('/deleteSubCategory/:subCategory', auth, adminController.deleteSubCategory);
 
 router.post('/addProduct', auth, adminController.addProduct);
+router.put('/editProduct/:id', auth, adminController.editProduct);
+
+router.put('/deleteProduct/:id', auth, adminController.deteleProduct);
 
 module.exports = router;
