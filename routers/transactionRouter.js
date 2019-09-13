@@ -4,6 +4,8 @@ const { auth } = require('../helpers/auth');
 
 const router = express.Router()
 
+router.get('/getUserTransaction', auth, transactionController.getTransaction);
+router.get('/getTransactionDetail/:id', auth, transactionController.getTransactionDetail)
 router.post('/addTransaction', auth, transactionController.addTransaction);
 
 module.exports = router;

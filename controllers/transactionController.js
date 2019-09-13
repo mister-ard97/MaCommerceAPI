@@ -15,7 +15,6 @@ module.exports = {
             userId: req.user.userId,
             status: 0,
             date_created: today,
-            expired_date: moment(today).add(10, 'm').format('YYYY-MM-DD HH:mm:ss'),
             is_deleted: 0
         }
 
@@ -24,9 +23,6 @@ module.exports = {
             if (err) {
                 return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
             }
-
-            console.log(results);
-            console.log(results.insertId);
 
             let values = []
 
@@ -101,26 +97,80 @@ module.exports = {
                                     return res.status(500).json({ err });
                                 }
 
-                                return res.status(200).send({
-                                    dataTransactionUI
+                                sql = `select 
+                                        td.*, 
+                                        p.name as productName
+                                    from transaction_detail as td 
+                                    join product as p on td.productId = p.id
+                                    where td.transactionId = ${results.insertId}`
+                                    
+                                mysql_conn.query(sql, (err, dataTransactionDetailUI) => {
+                                    if (err) {
+                                        return res.status(500).json({ err });
+                                    }
+                                    console.log('Data Transaction Detail UI')
+                                    console.log(dataTransactionDetailUI)
+
+                                    return res.status(200).send({
+                                        dataTransactionUI,
+                                        dataTransactionDetailUI
+                                    })
                                 })
                             })
                         })
                     })
-
-                   
                 })
 
             })
+        })
+    },
 
-            // sql = `select * from transaction where id=${results.insertId}`
-            // mysql_conn.query(sql, (err, transaksi) => {
-            //     if (err) {
-            //         return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
-            //     }
+    getTransaction: (req, res) => {
+        let sql = `select * from transaction where userId = ${req.user.userId}`;
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
 
+            if(results.length === 0) {
+                return res.status(500).send({status: 'Empty Transaction', message: 'There is not transaction in this user'})
+            }
 
-            // })
+            return res.status(200).send({
+                dataTransactionUI: results
+            })
+        })
+    },
+
+    getTransactionDetail: (req, res) => {
+        let sql = `select * from transaction where id = ${req.params.id}`
+        mysql_conn.query(sql ,(err, firstResults) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            sql = `select 
+            td.*, 
+            p.name as productName 
+                from transaction_detail as td 
+            join product as p 
+                on td.productId = p.id 
+            where td.transactionId = ${req.params.id}`
+
+            mysql_conn.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ err });
+                }
+
+                if (results.length === 0) {
+                    return res.status(500).send({ status: 'Empty Transaction Detail', message: `There isn't Transaction detail` })
+                }
+
+                return res.status(200).send({
+                    dataTransactionUI: firstResults,
+                    dataTransactionDetailUI: results
+                })
+            })
         })
     }
 }

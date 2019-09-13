@@ -104,8 +104,10 @@ module.exports = {
             if (err) {
                 return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
             }
-            console.log(firstResults)
-        
+            
+            if (firstResults.length === 0) {
+                return res.status(500).json({ status: 'No Product available', message: 'There are no product in database' });
+            }
 
             return res.status(200).send({
                 page: parseInt(req.query.page),
