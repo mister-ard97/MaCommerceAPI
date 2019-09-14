@@ -172,5 +172,60 @@ module.exports = {
                 })
             })
         })
+    },
+
+    uploadPaymentUser: (req, res) => {
+        try {
+            let path = '/payment';
+            const upload = uploader(path, 'MaCommerce').fields([{ name: 'paymentImage' }]);
+
+            upload(req, res, (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Upload picture failed !', error: err.message });
+                }
+
+                console.log(req.body.data)
+                const { paymentImage } = req.files
+                console.log(paymentImage)
+                const imagePath = paymentImage ? path + '/' + paymentImage[0].filename : null
+                console.log(imagePath)
+                
+                let sql = `update transaction set transactionImage = '${imagePath}', status = 1 where id = ${req.params.id}`
+                mysql_conn.query(sql, (err, results) => {
+                    if (err) {
+                        fs.unlinkSync('./public' + imagePath);
+                        return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
+                    }
+
+                    sql = `select * from transaction where id = ${req.params.id}`
+                    mysql_conn.query(sql, (err, TransactionSelected) => {
+                        if (err) {
+                            return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
+                        }
+
+                        sql = `select 
+                                td.*, 
+                                p.name as productName 
+                                    from transaction_detail as td 
+                                join product as p 
+                                    on td.productId = p.id 
+                                where td.transactionId = ${req.params.id}`
+                        
+                        mysql_conn.query(sql, (err, TransactionDetail) => {
+                            if (err) {
+                                return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
+                            } 
+
+                            return res.status(200).send({
+                                dataTransactionUI: TransactionSelected,
+                                dataTransactionDetailUI: TransactionDetail
+                            })
+                        })
+                    }) 
+                })
+            })
+        } catch (err) {
+
+        }
     }
 }

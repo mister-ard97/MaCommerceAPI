@@ -1,12 +1,23 @@
 const mysql = require('mysql');
 
-const mysqldb_conn = mysql.createConnection({
+// Untuk di komputer
+/* const mysqldb_conn = mysql.createConnection({
     host: 'localhost',
     user: 'reza_admin',
     password: 'reza_admin10071997',
     database: 'macommerce_db',
     port: 3306,
     multipleStatements: true
-}) 
+}) */
+
+// Untuk di laptop
+const mysqldb_conn = mysql.createConnection({
+    host: 'localhost',
+    user: 'rezadb',
+    password: 'rezadb10071997',
+    database: 'macommerce_db',
+    port: 3306,
+    multipleStatements: true
+})
 
 module.exports = mysqldb_conn;

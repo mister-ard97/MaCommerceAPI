@@ -7,5 +7,6 @@ const router = express.Router()
 router.get('/getUserTransaction', auth, transactionController.getTransaction);
 router.get('/getTransactionDetail/:id', auth, transactionController.getTransactionDetail)
 router.post('/addTransaction', auth, transactionController.addTransaction);
+router.post('/updatePaymentUser/:id', auth, transactionController.uploadPaymentUser)
 
 module.exports = router;
