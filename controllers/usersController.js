@@ -125,7 +125,8 @@ module.exports = {
                                         token: tokenJwt,
                                         status: results[0].status,
                                         UserImage: results[0].UserImage,
-                                        role: results[0].role
+                                        role: results[0].role,
+                                        address: results[0].address
                                     });
 
                                 })
@@ -177,7 +178,8 @@ module.exports = {
                         token: tokenJwt,
                         status: results[0].status,
                         UserImage: results[0].UserImage,
-                        role: results[0].role
+                        role: results[0].role,
+                        address: results[0].address
                     });
                 })
             })
@@ -227,7 +229,8 @@ module.exports = {
                     email: results[0].email,
                     token: tokenJwt,
                     status: results[0].status,
-                    role: results[0].role
+                    role: results[0].role,
+                    address: results[0].address
                 });
             })
         })
@@ -254,7 +257,8 @@ module.exports = {
                 token: tokenJwt,
                 status: results[0].status,
                 UserImage: results[0].UserImage,
-                role: results[0].role
+                role: results[0].role,
+                address: results[0].address
             });  
         })
     },
@@ -294,24 +298,13 @@ module.exports = {
                     token: tokenJwt,
                     status: results[0].status,
                     UserImage: results[0].UserImage,
-                    role: results[0].role
+                    role: results[0].role,
+                    address: results[0].address
                 });
             })
         })
     },
-
-    // userAddProductToCart: (req, res) => {
-
-    // },
-
-    // userTransactionHistory: (req, res) => {
-
-    // },
-
-    // userTransactionDetail: (req, res) => {
-
-    // },
-
+    
     // userAddLikeToProduct: (req, res) => {
 
     // }

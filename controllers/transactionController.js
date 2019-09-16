@@ -5,16 +5,22 @@ const fs = require('fs');
 const { uploader } = require('../helpers/uploader'); 
 
 module.exports = {
+    // User
     addTransaction: (req, res) => {
-        let today = new Date()
-        console.log(today.setMinutes(today.getMinutes() + 10))
+        let { firstName,
+            lastName,
+            total_price,
+            address } = req.body.dataUser 
 
-        console.log(req.body.data)
         let dataTransaction = {
             kodeTransaksi: 'MaCommerce' + Date.now(),
+            firstName,
+            lastName,
+            total_price,
+            addressUser: address,
             userId: req.user.userId,
             status: 0,
-            date_created: today,
+            date_created: new Date(),
             is_deleted: 0
         }
 
@@ -90,8 +96,8 @@ module.exports = {
                             if (err) {
                                 return res.status(500).json({ err });
                             }
-
-                            sql = `select * from transaction where id = ${results.insertId}`
+                           
+                            sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${results.insertId} and t.userId = ${req.user.userId}`
                             mysql_conn.query(sql, (err, dataTransactionUI) => {
                                 if (err) {
                                     return res.status(500).json({ err });
@@ -126,7 +132,7 @@ module.exports = {
     },
 
     getTransaction: (req, res) => {
-        let sql = `select * from transaction where userId = ${req.user.userId}`;
+        let sql = `select * from transaction where userId = ${req.user.userId} order by date_created desc`;
         mysql_conn.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).json({ err });
@@ -143,7 +149,7 @@ module.exports = {
     },
 
     getTransactionDetail: (req, res) => {
-        let sql = `select * from transaction where id = ${req.params.id}`
+        let sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${req.params.id} and t.userId = ${req.user.userId}`
         mysql_conn.query(sql ,(err, firstResults) => {
             if (err) {
                 return res.status(500).json({ err });
@@ -152,9 +158,8 @@ module.exports = {
             sql = `select 
             td.*, 
             p.name as productName 
-                from transaction_detail as td 
-            join product as p 
-                on td.productId = p.id 
+            from transaction_detail as td 
+            join product as p on td.productId = p.id 
             where td.transactionId = ${req.params.id}`
 
             mysql_conn.query(sql, (err, results) => {
@@ -197,19 +202,18 @@ module.exports = {
                         return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
                     }
 
-                    sql = `select * from transaction where id = ${req.params.id}`
+                    sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${req.params.id} and t.userId = ${req.user.userId}`
                     mysql_conn.query(sql, (err, TransactionSelected) => {
                         if (err) {
                             return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
                         }
 
                         sql = `select 
-                                td.*, 
-                                p.name as productName 
+                                        td.*, 
+                                        p.name as productName
                                     from transaction_detail as td 
-                                join product as p 
-                                    on td.productId = p.id 
-                                where td.transactionId = ${req.params.id}`
+                                    join product as p on td.productId = p.id
+                                    where td.transactionId = ${req.params.id}`
                         
                         mysql_conn.query(sql, (err, TransactionDetail) => {
                             if (err) {
@@ -225,7 +229,124 @@ module.exports = {
                 })
             })
         } catch (err) {
-
+            return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
         }
+    },
+
+    // Admin
+    getAllTransaction: (req, res) => {
+        let sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id order by t.date_created desc`
+        mysql_conn.query(sql, (err, AllTransaction) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            if (AllTransaction.length === 0) {
+                return res.status(500).send({ status: 'Empty Transaction', message: 'There is not transaction in this user' })
+            }
+
+            return res.status(200).send({
+                dataTransactionUI: AllTransaction
+            })
+        })
+    },
+
+    getTransactionAdminDetail: (req, res) => {
+        let sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${req.params.id}`
+        mysql_conn.query(sql, (err, firstResults) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            sql = `select 
+            td.*, 
+            p.name as productName 
+            from transaction_detail as td 
+            join product as p on td.productId = p.id 
+            where td.transactionId = ${req.params.id}`
+
+            mysql_conn.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ err });
+                }
+
+                if (results.length === 0) {
+                    return res.status(500).send({ status: 'Empty Transaction Detail', message: `There isn't Transaction detail` })
+                }
+
+                return res.status(200).send({
+                    dataTransactionUI: firstResults,
+                    dataTransactionDetailUI: results
+                })
+            })
+        })
+    },
+
+    refusePaymentSlipFromUser: (req, res) => {
+        let sql = `select * from transaction where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, transactionUser) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            if (transactionUser.length === 0) {
+                return res.status(500).send({ status: 'Wrong transaction id', message: 'There is not transaction data with this id' })
+            }
+
+            fs.unlinkSync('./public' + transactionUser[0].transactionImage);
+
+            sql = `update transaction set transactionImage = null, status = 9 where id = ${req.params.id}`;
+            mysql_conn.query(sql, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ err });
+                }
+
+                return res.status(200).send(results)
+            })
+        })
+    },
+
+    acceptPaymentSlipFromUser: (req, res) => {
+        let sql = `update transaction set status = 2 where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            return res.status(200).send(results)
+        })
+    },
+
+    sendProductToUser: (req, res) => {
+        let sql = `update transaction set status = 3 where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            return res.status(200).send(results)
+        })
+    },
+
+    confirmProduct: (req, res) => {
+        let sql = `update transaction set status = 4 where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            return res.status(200).send(results)
+        })
+    },
+
+    sendNotification: (req, res) => {
+        let sql = `update transaction set status = 8 where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            return res.status(200).send(results)
+        })
     }
 }

@@ -34,7 +34,7 @@ CREATE TABLE `cart` (
   `userId` int(11) NOT NULL,
   `is_deleted` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `cart` (
 
 LOCK TABLES `cart` WRITE;
 /*!40000 ALTER TABLE `cart` DISABLE KEYS */;
-INSERT INTO `cart` VALUES (1,2,0,3,4,0,200000,1400000,2,1),(2,3,0,1,1,0,250000,500000,2,1),(3,4,0,1,0,1,200000,400000,2,1),(4,7,0,0,1,0,200000,200000,2,1),(5,5,0,0,1,0,300000,300000,2,1),(6,6,1,0,0,0,250000,250000,2,1),(7,2,0,1,0,0,200000,200000,2,1),(8,3,0,1,0,0,250000,250000,2,1),(9,2,0,6,0,0,200000,1200000,2,1),(10,6,2,0,0,0,250000,500000,2,0),(11,7,0,1,0,0,200000,200000,2,0);
+INSERT INTO `cart` VALUES (16,3,0,0,1,0,250000,250000,2,0);
 /*!40000 ALTER TABLE `cart` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,7 +103,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES (1,'Western',4,5,150000,'Western Skirt','/product/MaCommerceProduct-1567892301227.jpg',0,'2019-09-08 04:38:21',1),(2,'Yellow Skirt',4,5,200000,'Yellow Skirt','/product/MaCommerceProduct-1567908591709.jpg',0,'2019-09-08 09:09:52',0),(3,'Black Pants',1,3,250000,'Black Pants Product For Men','/product/MaCommerceProduct-1567908644748.jpg',0,'2019-09-08 09:10:45',0),(4,'Kombat Green T-Shirt',1,2,200000,'Kombat Green T-Shirt, Product for Men','/product/MaCommerceProduct-1567908700173.jpg',0,'2019-09-08 09:11:40',0),(5,'Black Pants with Red Stripe',1,3,300000,'Black Pants with Red Stripe, Product for Men','/product/MaCommerceProduct-1567908769463.jpg',0,'2019-09-08 09:12:50',0),(6,'White T-Shirt',1,2,250000,'White T-Shirt, Product for Men ','/product/MaCommerceProduct-1567908818130.jpg',0,'2019-09-08 09:13:38',0),(7,'Glossys Skirt',4,5,200000,'Glossy Skirt, Product for Women','/product/MaCommerceProduct-1567908876106.jpg',0,'2019-09-08 09:15:09',0);
+INSERT INTO `product` VALUES (1,'Western',4,5,150000,'Western Skirt','/product/MaCommerceProduct-1567892301227.jpg',0,'2019-09-08 04:38:21',1),(2,'Yellow Skirts',4,5,200000,'Yellow Skirt','/product/MaCommerceProduct-1567908591709.jpg',0,'2019-09-15 10:00:36',0),(3,'Black Pants',1,3,250000,'Black Pants Product For Men','/product/MaCommerceProduct-1567908644748.jpg',0,'2019-09-08 09:10:45',0),(4,'Kombat Green T-Shirt',1,2,200000,'Kombat Green T-Shirt, Product for Men','/product/MaCommerceProduct-1567908700173.jpg',0,'2019-09-08 09:11:40',0),(5,'Black Pants with Red Stripe',1,3,300000,'Black Pants with Red Stripe, Product for Men','/product/MaCommerceProduct-1567908769463.jpg',0,'2019-09-08 09:12:50',0),(6,'White T-Shirt',1,2,250000,'White T-Shirt, Product for Men ','/product/MaCommerceProduct-1567908818130.jpg',0,'2019-09-08 09:13:38',0),(7,'Glossys Skirt',4,5,200000,'Glossy Skirt, Product for Women','/product/MaCommerceProduct-1567908876106.jpg',0,'2019-09-08 09:15:09',0);
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,7 +128,7 @@ CREATE TABLE `product_image` (
 
 LOCK TABLES `product_image` WRITE;
 /*!40000 ALTER TABLE `product_image` DISABLE KEYS */;
-INSERT INTO `product_image` VALUES (3,'/product/MaCommerceProduct-1567892301330.jpg',1),(4,'/product/MaCommerceProduct-1567892301339.jpg',1),(5,'/product/MaCommerceProduct-1567908591741.jpg',2),(6,'/product/MaCommerceProduct-1567908591759.jpg',2),(7,'/product/MaCommerceProduct-1567908644754.jpg',3),(8,'/product/MaCommerceProduct-1567908644769.jpg',3),(9,'/product/MaCommerceProduct-1567908700183.jpg',4),(10,'/product/MaCommerceProduct-1567908700288.jpg',4),(11,'/product/MaCommerceProduct-1567908769478.jpg',5),(12,'/product/MaCommerceProduct-1567908769496.jpg',5),(13,'/product/MaCommerceProduct-1567908818134.jpg',6),(14,'/product/MaCommerceProduct-1567908818138.jpg',6),(15,'/product/MaCommerceProduct-1567908876122.jpg',7),(16,'/product/MaCommerceProduct-1567908876122.jpg',7);
+INSERT INTO `product_image` VALUES (3,'/product/MaCommerceProduct-1567892301330.jpg',1),(4,'/product/MaCommerceProduct-1567892301339.jpg',1),(5,'/product/MaCommerceProduct-1567908591759.jpg',2),(6,'/product/MaCommerceProduct-1567908591759.jpg',2),(7,'/product/MaCommerceProduct-1567908644754.jpg',3),(8,'/product/MaCommerceProduct-1567908644769.jpg',3),(9,'/product/MaCommerceProduct-1567908700183.jpg',4),(10,'/product/MaCommerceProduct-1567908700288.jpg',4),(11,'/product/MaCommerceProduct-1567908769478.jpg',5),(12,'/product/MaCommerceProduct-1567908769496.jpg',5),(13,'/product/MaCommerceProduct-1567908818134.jpg',6),(14,'/product/MaCommerceProduct-1567908818138.jpg',6),(15,'/product/MaCommerceProduct-1567908876122.jpg',7),(16,'/product/MaCommerceProduct-1567908876122.jpg',7);
 /*!40000 ALTER TABLE `product_image` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -156,8 +156,74 @@ CREATE TABLE `stockproduct` (
 
 LOCK TABLES `stockproduct` WRITE;
 /*!40000 ALTER TABLE `stockproduct` DISABLE KEYS */;
-INSERT INTO `stockproduct` VALUES (1,0,12,12,0,1),(2,1,1,1,1,1),(3,0,10,10,0,2),(4,0,10,10,0,3),(5,0,10,5,4,4),(6,0,10,10,0,5),(7,5,10,10,10,6),(8,0,10,10,0,7);
+INSERT INTO `stockproduct` VALUES (1,0,12,12,0,1),(2,1,1,1,1,1),(3,0,7,10,0,2),(4,0,2,2,0,3),(5,0,7,0,1,4),(6,0,1,0,0,5),(7,0,1,4,3,6),(8,0,6,9,0,7);
 /*!40000 ALTER TABLE `stockproduct` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction`
+--
+
+DROP TABLE IF EXISTS `transaction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transaction` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `kodeTransaksi` varchar(100) NOT NULL,
+  `transactionImage` varchar(100) DEFAULT NULL,
+  `total_price` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `status` int(11) NOT NULL,
+  `date_created` datetime NOT NULL,
+  `is_deleted` int(11) NOT NULL,
+  `firstName` varchar(45) NOT NULL,
+  `lastName` varchar(45) NOT NULL,
+  `addressUser` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction`
+--
+
+LOCK TABLES `transaction` WRITE;
+/*!40000 ALTER TABLE `transaction` DISABLE KEYS */;
+INSERT INTO `transaction` VALUES (1,'MaCommerce1568517289272','/payment/MaCommerce-1568545820891.jpg',1050000,2,4,'2019-09-15 10:14:49',0,'','',''),(2,'MaCommerce1568522996618','/payment/MaCommerce-1568552516231.jpg',200000,2,4,'2019-09-15 11:49:57',0,'','',''),(3,'MaCommerce1568553400193','/payment/MaCommerce-1568553594623.jpg',1000000,2,4,'2019-09-15 20:16:40',0,'Reza','Ardiansyah','tangerang'),(4,'MaCommerce1568556816070',NULL,250000,2,0,'2019-09-15 21:13:36',0,'Reza','Ardiansyah','tangerang'),(5,'MaCommerce1568556860759',NULL,200000,2,0,'2019-09-15 21:14:21',0,'Reza','Ardiansyah','tangerang'),(6,'MaCommerce1568557978218','/payment/MaCommerce-1568558100969.jpg',1350000,3,4,'2019-09-15 21:32:58',0,'Ardi','Ansyah','jalan alamat rumah saya.');
+/*!40000 ALTER TABLE `transaction` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_detail`
+--
+
+DROP TABLE IF EXISTS `transaction_detail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transaction_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `productId` int(11) NOT NULL,
+  `small` int(11) DEFAULT '0',
+  `medium` int(11) DEFAULT '0',
+  `large` int(11) DEFAULT '0',
+  `xlarge` int(11) DEFAULT '0',
+  `price` int(11) NOT NULL,
+  `total_price` int(11) NOT NULL DEFAULT '0',
+  `transactionId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `is_deleted` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_detail`
+--
+
+LOCK TABLES `transaction_detail` WRITE;
+/*!40000 ALTER TABLE `transaction_detail` DISABLE KEYS */;
+INSERT INTO `transaction_detail` VALUES (1,5,0,1,0,0,300000,300000,1,2,0),(2,6,0,0,0,3,250000,750000,1,2,0),(3,4,0,0,0,1,200000,200000,2,2,0),(4,3,0,4,0,0,250000,1000000,3,2,0),(5,6,0,0,1,0,250000,250000,4,2,0),(6,4,0,0,0,1,200000,200000,5,2,0),(7,3,0,1,0,0,250000,250000,6,3,0),(8,2,0,3,0,0,200000,600000,6,3,0),(9,6,0,0,0,2,250000,500000,6,3,0);
+/*!40000 ALTER TABLE `transaction_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -180,7 +246,7 @@ CREATE TABLE `users` (
   `UserImage` varchar(255) DEFAULT NULL,
   `role` varchar(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -189,7 +255,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'adminMa1997','7b24718bd586fb2cb9757822d359a8fbdfb0a804e2af474b68a0ae29ec3d384b','rezardiansyah1997@gmail.com','Reza','Ardiansyah','tangerang','Verified','2019-08-30 20:24:12',NULL,'Admin'),(2,'user123','70c7f533f04ec32bb092efc88854934cbcbc1f35fa1476f507324721b65b003c','rezamusashi@gmail.com','Reza','Ardiansyah','tangerang','Verified','2019-08-30 20:25:44','/users/images/MaCommerce-1567171543697.jpg','User');
+INSERT INTO `users` VALUES (1,'adminMa1997','7b24718bd586fb2cb9757822d359a8fbdfb0a804e2af474b68a0ae29ec3d384b','rezardiansyah1997@gmail.com','Reza','Ardiansyah','tangerang','Verified','2019-08-30 20:24:12',NULL,'Admin'),(2,'user123','70c7f533f04ec32bb092efc88854934cbcbc1f35fa1476f507324721b65b003c','rezamusashi@gmail.com','Reza','Ardiansyah','tangerang','Verified','2019-08-30 20:25:44','/users/images/MaCommerce-1567171543697.jpg','User'),(3,'ardi1997','70c7f533f04ec32bb092efc88854934cbcbc1f35fa1476f507324721b65b003c','yubikitta@gmail.com','Ardi','Ansyah','jalan alamat rumah saya.','Verified','2019-09-15 21:18:08','/users/images/MaCommerce-1568557087701.png','User');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -202,4 +268,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-09-11 20:26:13
+-- Dump completed on 2019-09-16  8:21:25
