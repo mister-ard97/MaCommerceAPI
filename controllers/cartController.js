@@ -9,7 +9,7 @@ module.exports = {
             Qty,
         } = req.body.data
         console.log(req.body.data)
-        let sql = `select * from cart where userId = ${req.user.userId} and productId = ${productId} and is_deleted = 0`
+        let sql = `select * from cart where userId = ${req.user.userId} and productId = ${productId} and is_deleted = 0 and move_to_transaction = 0`
         mysql_conn.query(sql, (err, cartResults) => {
             if (err) {
                 return res.status(500).send({ status: 'error', err })
@@ -26,7 +26,8 @@ module.exports = {
                     price,
                     is_deleted: 0,
                     total_price: price * Qty,
-                    userId: req.user.userId
+                    userId: req.user.userId,
+                    move_to_transaction: 0
                 }
 
                 if(stockSelected === 'small') {
@@ -69,7 +70,7 @@ module.exports = {
                     dataDBCart.xlarge = Qty + cartResults[0].xlarge
                 }
 
-                sql = `update cart set ? where productId = ${productId} and userId = ${req.user.userId} and is_deleted = 0`
+                sql = `update cart set ? where productId = ${productId} and userId = ${req.user.userId} and is_deleted = 0 and move_to_transaction = 0`
                 
             }
 
@@ -78,7 +79,7 @@ module.exports = {
                     return res.status(500).send({ status: 'error', err })
                 }
 
-                sql = `select cart.*, p.name as productName, p.coverImage from cart join product as p on cart.productId = p.id where cart.userId = ${req.user.userId} and cart.is_deleted = 0;`
+                sql = `select cart.*, p.name as productName, p.coverImage from cart join product as p on cart.productId = p.id where cart.userId = ${req.user.userId} and cart.is_deleted = 0 and cart.move_to_transaction = 0;`
                 mysql_conn.query(sql, (err, cartUser) => {
                     if (err) {
                         return res.status(500).send({ status: 'error', err })
@@ -96,7 +97,7 @@ module.exports = {
     },
 
     showCart: (req, res) => {
-        let sql = `select cart.*, p.name as productName, p.coverImage from cart join product as p on cart.productId = p.id where cart.userId = ${req.user.userId} and cart.is_deleted = 0;`
+        let sql = `select cart.*, p.name as productName, p.coverImage from cart join product as p on cart.productId = p.id where cart.userId = ${req.user.userId} and cart.is_deleted = 0 and cart.move_to_transaction = 0;`
         mysql_conn.query(sql, (err, cartUser) => {
             if (err) {
                 return res.status(500).send({ status: 'error', err })
@@ -119,7 +120,7 @@ module.exports = {
             }
             console.log(results)
 
-            sql = `select cart.*, p.name as productName, p.coverImage from cart join product as p on cart.productId = p.id where cart.userId = ${req.user.userId} and cart.is_deleted = 0;`
+            sql = `select cart.*, p.name as productName, p.coverImage from cart join product as p on cart.productId = p.id where cart.userId = ${req.user.userId} and cart.is_deleted = 0 and cart.move_to_transaction = 0;`
             mysql_conn.query(sql, (err, cartUser) => {
                 if (err) {
                     return res.status(500).send({ status: 'error', err })

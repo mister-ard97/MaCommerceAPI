@@ -13,8 +13,12 @@ router.post('/addTransaction', auth, transactionController.addTransaction);
 router.post('/updatePaymentUser/:id', auth, transactionController.uploadPaymentUser);
 router.post('/refusePaymentUser/:id', auth, transactionController.refusePaymentSlipFromUser);
 router.post('/acceptPaymentUser/:id', auth, transactionController.acceptPaymentSlipFromUser);
+
 router.post('/sendProductToUser/:id', auth, transactionController.sendProductToUser);
 router.post('/confirmProductToAdmin/:id', auth, transactionController.confirmProduct);
-router.post('/sendNotificationProduct/:id', auth, transactionController.sendNotification)
+router.post('/sendNotificationProduct/:id', auth, transactionController.sendNotification);
+
+router.post('/refuseTransactionUser/:id', auth, transactionController.refuseTransaction);
+router.post('/acceptTransactionUser/:id', auth, transactionController.acceptTransaction);
 
 module.exports = router;

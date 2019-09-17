@@ -735,18 +735,18 @@ module.exports = {
                         return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
                     }
 
-                    if(results.length > 0) {
-                        if (productImage) {
-                            for (let i = 0; i <= productImage.length - 1; i++) {
-                                fs.unlinkSync('./public' + path + '/' + productImage[i].filename);
-                            }
-                        }
+                    // if(results.length > 0) {
+                    //     if (productImage) {
+                    //         for (let i = 0; i <= productImage.length - 1; i++) {
+                    //             fs.unlinkSync('./public' + path + '/' + productImage[i].filename);
+                    //         }
+                    //     }
 
-                        return res.status(500).send({
-                            status: 'Duplicate Data',
-                            message: `Product dengan nama '${productName}' dengan Category dan Sub Category telah terdaftar di database`
-                        })
-                    }
+                    //     return res.status(500).send({
+                    //         status: 'Duplicate Data',
+                    //         message: `Product dengan nama '${productName}' dengan Category dan Sub Category telah terdaftar di database`
+                    //     })
+                    // }
 
                     sql = `select * from product where id = ${req.params.id}`;
                     mysql_conn.query(sql, (err, hasilProductQuery) => {

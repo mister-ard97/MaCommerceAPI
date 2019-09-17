@@ -19,7 +19,7 @@ module.exports = {
             total_price,
             addressUser: address,
             userId: req.user.userId,
-            status: 0,
+            status: 10,
             date_created: new Date(),
             is_deleted: 0
         }
@@ -30,103 +30,58 @@ module.exports = {
                 return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
             }
 
-            let values = []
+            sql = ''
 
             req.body.data.forEach((val) => {
-                values.push([val.productId, val.small, val.medium, val.large, val.xlarge, val.price, val.total_price, results.insertId, val.userId, 0])
+                sql += `update cart set move_to_transaction = 1 where userId = ${val.userId} and is_deleted = 0 and move_to_transaction = 0;`
             })
 
-            sql = `insert into transaction_detail (productId, small, medium, large, xlarge, price, total_price, transactionId, userId, is_deleted) values ?`
-            mysql_conn.query(sql, [values], (err, insertStatus) => {
+            mysql_conn.query(sql, (err, moveToTransaction) => {
                 if (err) {
-                     return res.status(500).json({ err });
+                    return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
                 }
 
-                sql = 'select * from stockproduct where productId in ('
+                sql = ''
 
-                req.body.data.forEach((val, id) => {
-                    if(id !== req.body.data.length - 1) {
-                        sql += val.productId + ', '
-                    } else {
-                        sql += val.productId
-                    }
+                let values = []
+
+                req.body.data.forEach((val) => {
+                    values.push([val.productId, val.small, val.medium, val.large, val.xlarge, val.price, val.total_price, results.insertId, val.userId, 0])
                 })
 
-                sql += ')'
-
-                mysql_conn.query(sql, (err, resultsStock) => {
+                sql = `insert into transaction_detail (productId, small, medium, large, xlarge, price, total_price, transactionId, userId, is_deleted) values ?`
+                mysql_conn.query(sql, [values], (err, insertStatus) => {
                     if (err) {
                         return res.status(500).json({ err });
                     }
 
-                    sql = ''
-
-                    resultsStock.forEach((val) => {
-                        sql += `update stockproduct set `
-                        req.body.data.forEach((dataCart) => {
-                            if (val.productId === dataCart.productId) {
-                                val.small -= dataCart.small
-                                sql += `small = ${val.small}, `
-
-                                val.medium -= dataCart.medium
-                                sql += `medium = ${val.medium}, `
-
-                                val.large -= dataCart.large
-                                sql += `large = ${val.large}, `
-
-                                val.xlarge -= dataCart.xlarge
-                                sql += `xlarge = ${val.xlarge}`
-
-                                sql += ` where productId = ${dataCart.productId};`
-                            }
-                        })
-                    })
-
-                    mysql_conn.query(sql, (err, resultUpdateStock) => {
+                    sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${results.insertId} and t.userId = ${req.user.userId}`
+                    mysql_conn.query(sql, (err, dataTransactionUI) => {
                         if (err) {
                             return res.status(500).json({ err });
                         }
 
-
-                        req.body.data.forEach((val) => {
-                            sql += `delete from cart where userId = ${val.userId} and is_deleted = 0;`
-                        })
-
-                        mysql_conn.query(sql, (err, deleteResults) => {
-                            if (err) {
-                                return res.status(500).json({ err });
-                            }
-                           
-                            sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${results.insertId} and t.userId = ${req.user.userId}`
-                            mysql_conn.query(sql, (err, dataTransactionUI) => {
-                                if (err) {
-                                    return res.status(500).json({ err });
-                                }
-
-                                sql = `select 
+                        sql = `select 
                                         td.*, 
                                         p.name as productName
                                     from transaction_detail as td 
                                     join product as p on td.productId = p.id
                                     where td.transactionId = ${results.insertId}`
-                                    
-                                mysql_conn.query(sql, (err, dataTransactionDetailUI) => {
-                                    if (err) {
-                                        return res.status(500).json({ err });
-                                    }
-                                    console.log('Data Transaction Detail UI')
-                                    console.log(dataTransactionDetailUI)
 
-                                    return res.status(200).send({
-                                        dataTransactionUI,
-                                        dataTransactionDetailUI
-                                    })
-                                })
+                        mysql_conn.query(sql, (err, dataTransactionDetailUI) => {
+                            if (err) {
+                                return res.status(500).json({ err });
+                            }
+                            console.log('Data Transaction Detail UI')
+                            console.log(dataTransactionDetailUI)
+
+                            return res.status(200).send({
+                                dataTransactionUI,
+                                dataTransactionDetailUI
                             })
                         })
                     })
                 })
-
             })
         })
     },
@@ -281,6 +236,136 @@ module.exports = {
             })
         })
     },
+
+    refuseTransaction: (req, res) => {
+        let sql = `update transaction set status = 11 where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, updateTransaction) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            sql = `select * from transaction_detail where transactionId = ${req.params.id}`
+            mysql_conn.query(sql, (err, refuseTransactionDetail) => {
+                if (err) {
+                    return res.status(500).json({ err });
+                }
+
+                sql = ''
+
+                refuseTransactionDetail.forEach((val) => {
+                    sql += `update cart set is_deleted = 1 where userId = ${val.userId} and is_deleted = 0 and move_to_transaction = 1;`
+                })
+
+                mysql_conn.query(sql, (err, updateRefuseTransction) => {
+                    if (err) {
+                        return res.status(500).json({ err });
+                    }
+
+                    return res.status(200).send(updateRefuseTransction)
+                })
+            })
+        })
+    },
+
+    acceptTransaction: (req, res) => {
+        let sql = `update transaction set status = 0 where id = ${req.params.id}`;
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ err });
+            }
+
+            sql = `select * from transaction_detail where transactionId = ${req.params.id}`
+            mysql_conn.query(sql, (err, dataTransactionDetail) => {
+                if (err) {
+                    return res.status(500).json({ err });
+                }
+
+                sql = 'select * from stockproduct where productId in ('
+
+                dataTransactionDetail.forEach((val, id) => {
+                    if (id !== dataTransactionDetail.length - 1) {
+                        sql += val.productId + ', '
+                    } else {
+                        sql += val.productId
+                    }
+                })
+
+                sql += ')'
+                mysql_conn.query(sql, (err, listStockProduct) => {
+                    if (err) {
+                        return res.status(500).json({ err });
+                    }
+
+                    sql = ''
+
+                    listStockProduct.forEach((val) => {
+                        sql += `update stockproduct set `
+                        dataTransactionDetail.forEach((dataCart) => {
+                            if (val.productId === dataCart.productId) {
+                                val.small -= dataCart.small
+                                sql += `small = ${val.small}, `
+
+                                val.medium -= dataCart.medium
+                                sql += `medium = ${val.medium}, `
+
+                                val.large -= dataCart.large
+                                sql += `large = ${val.large}, `
+
+                                val.xlarge -= dataCart.xlarge
+                                sql += `xlarge = ${val.xlarge}`
+
+                                sql += ` where productId = ${dataCart.productId};`
+                            }
+                        })
+                    })
+
+                    mysql_conn.query(sql, (err, results) => {
+                        if (err) {
+                            return res.status(500).json({ err });
+                        }
+
+                        sql = ''
+
+                        dataTransactionDetail.forEach((val) => {
+                            sql += `delete from cart where userId = ${val.userId} and is_deleted = 0 and move_to_transaction = 1;`
+                        })
+
+                        mysql_conn.query(sql, (err, deleteCart) => {
+                            if (err) {
+                                return res.status(500).json({ err });
+                            }
+
+                            sql = `select t.*, u.username from transaction as t join users as u on t.userId = u.id where t.id = ${req.params.id} and t.userId = ${req.user.userId}`
+                            mysql_conn.query(sql, (err, dataTransactionUI) => {
+                                if (err) {
+                                    return res.status(500).json({ err });
+                                }
+
+                                sql = `select 
+                                        td.*, 
+                                        p.name as productName
+                                    from transaction_detail as td 
+                                    join product as p on td.productId = p.id
+                                    where td.transactionId = ${req.params.id}`
+                                
+                                mysql_conn.query(sql, (err, dataTransactionDetailUI) => {
+                                    if (err) {
+                                        return res.status(500).json({ err });
+                                    }
+
+                                    return res.status(200).send({
+                                        dataTransactionUI,
+                                        dataTransactionDetailUI
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    },
+
 
     refusePaymentSlipFromUser: (req, res) => {
         let sql = `select * from transaction where id = ${req.params.id}`;
