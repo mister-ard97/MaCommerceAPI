@@ -199,7 +199,7 @@ module.exports = {
                         subcat.name as sub_category 
                     from product as p 
                     join category as c on p.categoryId = c.id
-                    join category as subcat on p.subcategoryId = subcat.id where p.is_deleted = 0 limit 0, ${req.query.limit}`
+                    join category as subcat on p.subcategoryId = subcat.id where p.is_deleted = 0 and p.popularCount >= 1 order by p.popularCount desc limit 0, ${req.query.limit}`
 
         mysql_conn.query(sql, (err, resultsProduct) => {
             if (err) {
