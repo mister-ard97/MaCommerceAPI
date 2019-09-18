@@ -57,7 +57,7 @@ module.exports = {
         console.log(req.query)
 
         let offset = 0;
-        
+
         if (!req.query.page) {
             req.query.page = 1
         }
@@ -79,43 +79,76 @@ module.exports = {
                     join category as c on p.categoryId = c.id
                     join category as subcat on p.subcategoryId = subcat.id where p.is_deleted = 0`
 
-        if(req.query.product) {
+        if (req.query.product) {
             sql += ` and c.name = '${req.query.product}'`
         }
-        if(req.query.productName) {
-            sql += ` and p.name like '%${req.query.productName}%'`
-        }
 
-        if(req.query.categoryId) {
+        if (req.query.productName) {
+            sql += ` and p.name like '${req.query.productName}%'`
+        } 
+
+        if (req.query.categoryId) {
             sql += ` and c.id = ${req.query.categoryId}`
         }
 
-        if(req.query.subCategoryId) {
+        if (req.query.subCategoryId) {
             sql += ` and subcat.id = ${req.query.subCategoryId}`
         }
 
-        if(!req.query.showData) {
+        if (!req.query.showData) {
             req.query.showData = 4
         }
-        
+
         sql += ` limit ${offset}, ${req.query.showData}`
 
         mysql_conn.query(sql, (err, firstResults) => {
             if (err) {
                 return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
             }
-            
+
             if (firstResults.length === 0) {
                 return res.status(500).json({ status: 'No Product available', message: 'There are no product in database' });
             }
 
-            return res.status(200).send({
-                page: parseInt(req.query.page),
-                totalProduct: parseInt(firstResults.length),
-                total_pages: Math.ceil(parseInt(firstResults.length) / 4),
-                categoryName: req.query.categoryName,
-                subCategoryName: req.query.subCategory,
-                dataProduct: firstResults
+            let category = 0
+
+            if(req.query.categoryId) {
+                category = req.query.categoryId
+            } else {
+                category = 9999
+            }
+
+            sql = `select name as categoryName from category where id = ${category}`
+
+            mysql_conn.query(sql, (err, categoryName) => {
+                if (err) {
+                    return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
+                }
+
+                let subcategory = 0
+
+                if (req.query.subCategoryId) {
+                    subcategory = req.query.subCategoryId
+                } else {
+                    subcategory = 9999
+                }
+
+                sql = `select name as subCategoryName from category where id = ${subcategory}`
+
+                mysql_conn.query(sql, (err, subCategoryName) => {
+                    if (err) {
+                        return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
+                    }
+
+                    return res.status(200).send({
+                        page: parseInt(req.query.page),
+                        totalProduct: parseInt(firstResults.length),
+                        total_pages: Math.ceil(parseInt(firstResults.length) / 4),
+                        categoryName: categoryName.length !== 0 ? categoryName[0].categoryName : null,
+                        subCategoryName: subCategoryName.length !== 0 ? subCategoryName[0].subCategoryName : null,
+                        dataProduct: firstResults
+                    })
+                })
             })
         })
     },
@@ -126,7 +159,10 @@ module.exports = {
             stk.small, 
             stk.medium, 
             stk.large, 
-            stk.xlarge
+            stk.xlarge,
+            c.name as category_name, 
+            subcat.id as id_sub_category,
+            subcat.name as sub_category_name
         from product as p join category as c on p.categoryId = c.id 
         join category as subcat on p.subcategoryId = subcat.id join stockproduct as stk on stk.productId = p.id where p.is_deleted = 0 and p.id = ${req.params.id}`
 

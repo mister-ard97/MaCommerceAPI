@@ -230,7 +230,8 @@ module.exports = {
                     token: tokenJwt,
                     status: results[0].status,
                     role: results[0].role,
-                    address: results[0].address
+                    address: results[0].address, 
+                    UserImage: results[0].UserImage
                 });
             })
         })
@@ -304,8 +305,64 @@ module.exports = {
             })
         })
     },
-    
-    // userAddLikeToProduct: (req, res) => {
 
-    // }
+    userWishlistProduct : (req, res) => {
+        let sql = `select * from wishlist where productId = ${req.params.id} and userId = ${req.user.userId}`
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+
+            return res.status(200).send({wishlistUser: results.length})
+        })
+    },
+    
+    userToggleWishlistProduct: (req, res) => {
+        let sql = `select * from wishlist where productId = ${req.params.id} and userId = ${req.user.userId}`
+        mysql_conn.query(sql, (err, wishlistUser) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+
+            if (wishlistUser.length === 0) {
+               sql = `insert into wishlist (productId, userId) values (${req.params.id}, ${req.user.userId})`;
+           } else {
+               sql = `delete from wishlist where productId = ${req.params.id} and userId = ${req.user.userId}`
+           }
+
+           mysql_conn.query(sql, (err, toggleWishlist) => {
+               if (err) {
+                   return res.status(500).send({ status: 'error', err })
+               }
+
+               sql = `select * from wishlist where productId = ${req.params.id} and userId = ${req.user.userId}`
+               mysql_conn.query(sql, (err, updateUserWishlist) => {
+                   if (err) {
+                       return res.status(500).send({ status: 'error', err })
+                   }
+
+                   sql = `select * from product where id = ${req.params.id}`
+                   mysql_conn.query(sql, (err, dataProduct) => {
+                       if (err) {
+                           return res.status(500).send({ status: 'error', err })
+                       }
+
+                       if (wishlistUser.length === 0) {
+                           sql = `update product set popularCount = ${dataProduct[0].popularCount + 1} where id = ${req.params.id}`
+                       } else {
+                           sql = `update product set popularCount = ${dataProduct[0].popularCount - 1} where id = ${req.params.id}`
+                       }
+
+                       mysql_conn.query(sql, (err, updateCount) => {
+                           if (err) {
+                               return res.status(500).send({ status: 'error', err })
+                           }
+
+                           return res.status(200).send({ wishlistUser: updateUserWishlist.length })
+                       })
+                   })
+               })
+           })
+        }) 
+    }
 }
