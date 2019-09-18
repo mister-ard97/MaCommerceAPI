@@ -306,6 +306,22 @@ module.exports = {
         })
     },
 
+    userGetWishlist: (req, res) => {
+        let sql = `select 
+        p.coverImage, 
+        p.name as productName, 
+        p.id as productId,
+        p.price
+        from wishlist as w join product as p on w.productId = p.id where w.userId = ${req.user.userId}`
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+
+            return res.status(200).send({ allWishlistUser: results })
+        })
+    },
+
     userWishlistProduct : (req, res) => {
         let sql = `select * from wishlist where productId = ${req.params.id} and userId = ${req.user.userId}`
         mysql_conn.query(sql, (err, results) => {
@@ -364,5 +380,28 @@ module.exports = {
                })
            })
         }) 
+    },
+
+    userChangeAddress: (req, res) => {
+        let sql = `update users set ? where id = ${req.user.userId}`
+        mysql_conn.query(sql, req.body.data, (err, results) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+            console.log(results)
+
+            sql = `select FirstName, LastName, address from users where id = ${req.user.userId} and username = '${req.user.username}'`
+            mysql_conn.query(sql, (err, updateData) => {
+                if (err) {
+                    return res.status(500).send({ status: 'error', err })
+                }
+
+                return res.status(200).send({
+                    FirstName: updateData[0].FirstName,
+                    LastName: updateData[0].LastName,
+                    address: updateData[0].address
+                })
+            })
+        })
     }
 }
