@@ -487,7 +487,7 @@ module.exports = {
         let sql = `select * from category where name='${req.params.categoryName}'`;
         mysql_conn.query(sql, (err, firstResults) => {
             if(err) {
-
+                return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
             }
 
             if(firstResults.length > 0) {
@@ -499,13 +499,20 @@ module.exports = {
 
                     fs.unlinkSync('./public' + firstResults[0].categoryImage);
 
-                    sql = `select id, name, categoryImage from category where parentId IS NULL`
-                    mysql_conn.query(sql, (err, results) => {
+                    sql = `update product set is_deleted = 1 where categoryId = ${firstResults[0].id}`
+                    mysql_conn.query(sql, (err, deleteResults) => {
                         if (err) {
                             return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
                         }
 
-                        return res.status(200).send({ categoryParent: results })
+                        sql = `select id, name, categoryImage from category where parentId IS NULL`
+                        mysql_conn.query(sql, (err, results) => {
+                            if (err) {
+                                return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
+                            }
+
+                            return res.status(200).send({ categoryParent: results })
+                        })
                     })
                 })
             }
@@ -521,22 +528,29 @@ module.exports = {
 
             let parentId = results[0].parentId;
             sql = `delete from category where name='${req.params.subCategory}'`;
-            mysql_conn.query(sql, (err, results) => {
+            mysql_conn.query(sql, (err, deleteResults) => {
                 if (err) {
                     return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
                 }
 
-                sql = `select 
-                            c.id as parentId, 
-                            c2.id as idsubcategory, 
-                            c2.name as subcategory 
-                            from category as c join category as c2 on c2.parentId = ${parentId}`;
-                mysql_conn.query(sql, (err, results) => {
+                sql = `update product set is_deleted = 1 where subcategoryId = ${results[0].id}`
+                mysql_conn.query(sql, (err, updateResult) => {
                     if (err) {
                         return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
                     }
 
-                    return res.status(200).send({subCategory: results})
+                    sql = `select 
+                            c.id as parentId, 
+                            c2.id as idsubcategory, 
+                            c2.name as subcategory 
+                            from category as c join category as c2 on c2.parentId = ${parentId}`;
+                    mysql_conn.query(sql, (err, results) => {
+                        if (err) {
+                            return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
+                        }
+
+                        return res.status(200).send({ subCategory: results })
+                    })
                 })
             })
         })
@@ -600,7 +614,7 @@ module.exports = {
 
                    
                     let arrayProductImage = []
-
+                    
                     for (let i = 1; i <= productImage.length - 1; i++) {
                         if (productImage[i]) {
                             arrayProductImage.push(path + '/' + productImage[i].filename)

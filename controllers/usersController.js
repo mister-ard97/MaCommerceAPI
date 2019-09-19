@@ -312,7 +312,7 @@ module.exports = {
         p.name as productName, 
         p.id as productId,
         p.price
-        from wishlist as w join product as p on w.productId = p.id where w.userId = ${req.user.userId}`
+        from wishlist as w join product as p on w.productId = p.id where w.userId = ${req.user.userId} and p.is_deleted = 0`
         mysql_conn.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send({ status: 'error', err })
