@@ -403,5 +403,136 @@ module.exports = {
                 })
             })
         })
+    },
+
+    commentOnProduct: (req, res) => {
+        console.log(req.body.dataComment)
+        req.body.dataComment.userId = req.user.userId
+        req.body.dataComment.date_created = new Date();
+        console.log(req.body.dataComment)
+        let sql = `insert into comment set ?`
+        mysql_conn.query(sql, req.body.dataComment, (err, results) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+
+            let dataNotification = {
+                userId: req.user.userId,
+                productId: req.body.dataComment.productId,
+                commentId: results.insertId
+            }
+
+            sql = `insert into notification set ?`
+            mysql_conn.query(sql, dataNotification, (err, results1) => {
+                if (err) {
+                    return res.status(500).send({ status: 'error', err })
+                }
+
+                sql = `select c.id,
+                        c.comment,
+                        c.commentId,
+                        c.date_created,
+                        c.is_edited,
+                        u.username,
+                        u.UserImage,
+                        u.role
+                    from comment as c join users as u
+                    on c.userId = u.id where c.productId = ${req.body.dataComment.productId} order by c.date_created desc`
+                mysql_conn.query(sql, (err, commentResults) => {
+                    if (err) {
+                        return res.status(500).send({ status: 'error', err })
+                    }
+
+                    sql = `select 
+                                rc.comment, 
+                                rc.commentId,
+                                rc.date_created,
+                                rc.is_edited,
+                                u.username,
+                                u.UserImage,
+                                u.role
+                                from comment as rc 
+                            join comment as c on rc.commentId = c.id
+                            join users as u on rc.userId = u.id where rc.productId = ${req.body.dataComment.productId} order by rc.date_created asc`
+                    
+                    mysql_conn.query(sql, (err, dataReply) => {
+                        if (err) {
+                            return res.status(500).send({ status: 'error', err })
+                        }
+
+                        return res.status(200).send({ 
+                            dataComment : commentResults,
+                            dataReply
+                        })
+                    })
+                })
+            })
+        })
+    },
+
+    replyCommentProduct: (req, res) => {
+        req.body.dataReply.userId = req.user.userId
+        req.body.dataReply.date_created = new Date();
+
+        let sql = `insert into comment set ?`
+        mysql_conn.query(sql, req.body.dataReply, (err, results) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+
+            let dataNotification = {
+                userId: req.user.userId,
+                productId: req.body.dataReply.productId,
+                commentId: req.body.dataReply.commentId
+            }
+
+            sql = `insert into notification set ?`
+            mysql_conn.query(sql, dataNotification, (err, results) => {
+                if (err) {
+                    return res.status(500).send({ status: 'error', err })
+                }
+
+                sql = `select c.id,
+                            c.comment,
+                            c.commentId,
+                            c.date_created,
+                            c.is_edited,
+                            u.username,
+                            u.UserImage,
+                            u.role
+                        from comment as c 
+                        join users as u on c.userId = u.id 
+                        where c.productId = ${req.body.dataReply.productId} order by c.date_created desc;`
+                mysql_conn.query(sql, (err, commentResults) => {
+                    if (err) {
+                        return res.status(500).send({ status: 'error', err })
+                    }
+
+                    sql = `select 
+                                rc.comment, 
+                                rc.commentId,
+                                rc.date_created,
+                                rc.is_edited,
+                                u.username,
+                                u.UserImage,
+                                u.role
+                                from comment as rc 
+                            join comment as c on rc.commentId = c.id
+                            join users as u on rc.userId = u.id where rc.productId = ${req.body.dataReply.productId} order by rc.date_created asc`
+
+                    mysql_conn.query(sql, (err, dataReply) => {
+                        if (err) {
+                            return res.status(500).send({ status: 'error', err })
+                        }
+
+                        return res.status(200).send({
+                            dataComment: commentResults,
+                            dataReply
+                        })
+                    })
+                })
+            })
+        })
+
     }
 }

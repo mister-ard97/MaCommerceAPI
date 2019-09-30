@@ -214,6 +214,47 @@ module.exports = {
                 dataProduct: resultsProduct
             })
         })
+    },
+
+    getCommentProduct: (req, res) => {
+        let sql = `select c.id,
+                        c.comment,
+                        c.commentId,
+                        c.date_created,
+                        c.is_edited,
+                        u.username,
+                        u.UserImage,
+                        u.role
+                    from comment as c join users as u
+                    on c.userId = u.id where c.productId = ${req.params.id} order by c.date_created desc`
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
+            }
+
+            sql = `select 
+                    rc.comment, 
+                    rc.commentId,
+                    rc.date_created,
+                    rc.is_edited,
+                    u.username,
+                    u.UserImage,
+                    u.role
+                    from comment as rc 
+                    join comment as c on rc.commentId = c.id
+                    join users as u on rc.userId = u.id where rc.productId = ${req.params.id} order by rc.date_created asc`
+            
+            mysql_conn.query(sql, (err, replyResults) => {
+                if (err) {
+                    return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err });
+                }
+
+                return res.status(200).send({
+                    dataComment: results,
+                    dataReply: replyResults
+                })
+            })
+        })
     }
 
 }

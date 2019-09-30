@@ -12,7 +12,9 @@ router.post('/userLogin', usersController.userLogin);
 router.get('/getWishlist', auth, usersController.userGetWishlist);
 router.get('/userWishlistProduct/:id', auth, usersController.userWishlistProduct);
 router.post('/userToggleWishlist/:id', auth, usersController.userToggleWishlistProduct);
-router.post('/userChangeAddress', auth, usersController.userChangeAddress)
+router.post('/userChangeAddress', auth, usersController.userChangeAddress);
+router.post('/userComment', auth, usersController.commentOnProduct);
+router.post('/userReplyComment', auth, usersController.replyCommentProduct);
 
 module.exports = router;
 
