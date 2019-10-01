@@ -88,7 +88,7 @@ module.exports = {
                                 return res.status(500).json({ message: "There's an error on the server. Please contact the administrator.", error: err.message });
                             }
 
-                            sql = `select * from users where username='${username}' and role='User'`
+                            sql = `select * from users where username='${username}' and role='User' and googleId IS NULL`
                             mysql_conn.query(sql, (err, results) => {
                                 if (err) {
                                     return res.status(500).send({ status: 'error', err })
@@ -140,8 +140,79 @@ module.exports = {
         }
     }, 
 
-    userUpdateData: (req, res) => {
+    userLoginWithGoogle: (req, res) => {
+        let encryptGoogleId = Crypto.createHmac('sha256', 'macommerce_api')
+                                .update(req.body.data.googleId).digest('hex')
 
+        let sql = `select * from users where googleId = '${encryptGoogleId}'`
+
+        mysql_conn.query(sql, (err, results) => {
+            if (err) {
+                return res.status(500).send({ status: 'error', err })
+            }
+
+            if(results.length === 0) {
+                // Apabila belum pernah login menggunakan gmail
+                sql = `insert into users set ?`
+
+                req.body.data.googleId = encryptGoogleId
+                req.body.data.role = 'User'
+                req.body.data.status = 'Verified'
+                req.body.data.UserImage = '/defaultPhoto/defaultUser.png'
+                req.body.data.LastLogin = new Date();
+                
+                mysql_conn.query(sql, req.body.data, (err, results1) => {
+                    if (err) {
+                        return res.status(500).send({ status: 'error', err })
+                    }
+
+                    sql = `select * from users where id = ${results1.insertId}`
+                    mysql_conn.query(sql, (err, results) => {
+                        if (err) {
+                            return res.status(500).send({ status: 'error', err })
+                        }
+
+                        const tokenJwt = createJWTToken({ userId: results[0].id, username: results[0].username })
+                        
+                        return res.status(200).send({
+                            FirstName: results[0].FirstName,
+                            LastName: results[0].LastName,
+                            username: results[0].username,
+                            email: results[0].email,
+                            token: tokenJwt,
+                            status: results[0].status,
+                            UserImage: results[0].UserImage,
+                            role: results[0].role,
+                            address: results[0].address
+                        });
+                    })
+                })
+            
+            } else {
+
+                // Apabila telah login menggunakan google, maka data tidak akan di insert lagi
+                sql = `select * from users where googleId = '${encryptGoogleId}'`
+                mysql_conn.query(sql, (err, results) => {
+                    if (err) {
+                        return res.status(500).send({ status: 'error', err })
+                    }
+
+                    const tokenJwt = createJWTToken({ userId: results[0].id, username: results[0].username })
+
+                    return res.status(200).send({
+                        FirstName: results[0].FirstName,
+                        LastName: results[0].LastName,
+                        username: results[0].username,
+                        email: results[0].email,
+                        token: tokenJwt,
+                        status: results[0].status,
+                        UserImage: results[0].UserImage,
+                        role: results[0].role,
+                        address: results[0].address
+                    });
+                })
+            }
+        })
     },
 
     emailVerification: (req, res) => {
@@ -238,7 +309,7 @@ module.exports = {
     },
 
     keepLoginUser: (req, res) => {
-        let sql = `select * from users where id = ${req.user.userId}`;
+        let sql = `select * from users where id = ${req.user.userId} and username = '${req.user.username}'`;
         mysql_conn.query(sql, (err, results) => {
             if (err) {
                 return res.status(500).send({ status: 'error', err })
