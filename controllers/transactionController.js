@@ -1,6 +1,7 @@
 const mysql_conn = require('../database');
 const moment = require('moment')
 const fs = require('fs');
+const midtransClient = require('midtrans-client');
 
 const { uploader } = require('../helpers/uploader'); 
 
@@ -433,5 +434,38 @@ module.exports = {
 
             return res.status(200).send(results)
         })
+    },
+
+
+    // Tes midtrans
+    simpleCheckOutMidTrans: (req, res) => {
+        console.log('Testtttt')
+        console.log(req.body.total_price)
+        // initialize snap client object
+        let snap = new midtransClient.Snap({
+            isProduction: false,
+            serverKey: 'SB-Mid-server-GwUP_WGbJPXsDzsNEBRs8IYA',
+            clientKey: 'SB-Mid-client-61XuGAwQ8Bj8LxSS'
+        });
+        let parameter = {
+            "transaction_details": {
+                "order_id": "order-id-node-" + Math.round((new Date()).getTime() / 1000),
+                "gross_amount": req.body.total_price
+            }, "credit_card": {
+                "secure": true
+            },
+            "enabled_payments": [
+                "gopay"
+            ]
+        };
+        console.log(parameter)
+        // create snap transaction token
+        snap.createTransactionToken(parameter)
+            .then((transactionToken) => {
+                // pass transaction token to frontend
+                res.status(200).send({
+                    token: transactionToken
+                })
+            })
     }
 }

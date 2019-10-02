@@ -21,4 +21,8 @@ router.post('/sendNotificationProduct/:id', auth, transactionController.sendNoti
 router.post('/refuseTransactionUser/:id', auth, transactionController.refuseTransaction);
 router.post('/acceptTransactionUser/:id', auth, transactionController.acceptTransaction);
 
+router.post('/simple_checkout_with_midtrans', auth, transactionController.simpleCheckOutMidTrans)
+
+
+
 module.exports = router;
