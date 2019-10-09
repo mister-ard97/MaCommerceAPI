@@ -13,8 +13,8 @@ const mysql = require('mysql');
 // Untuk di laptop
  const mysqldb_conn = mysql.createConnection({
      host: 'localhost',
-     user: 'rezadb',
-     password: 'rezadb10071997',
+     user: 'reza_db',
+     password: 'reza_db10071997',
      database: 'macommerce_db',
      port: 3306,
      multipleStatements: true
